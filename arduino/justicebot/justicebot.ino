@@ -55,27 +55,23 @@ void loop()
   // set motor direction if input is UP or DOWN
   if (serial_data[0] == 'u')
   {
-    Serial.println("Attack!");
     leftMotor->run(BACKWARD);
     rightMotor->run(FORWARD);
   }
   else if (serial_data[0] == 'd')
   {
-    Serial.println("Retreat!");
     leftMotor->run(FORWARD);
     rightMotor->run(BACKWARD);
   }
   // adjust motor power if input is PGUP or PGDOWN
   else if (serial_data[0] == 'f')
   {
-    Serial.println("Get moving!");
     motor_full_power = min(255, motor_full_power + MOTOR_STEP);
     set_power(prev_data[0]); // set powers based on previous input,
                              // since this one didn't change any direction
   }
   else if (serial_data[0] == 's')
   {
-    Serial.println("Ease up, man!");
     motor_full_power = max(0, motor_full_power - MOTOR_STEP);
     set_power(prev_data[0]); // set powers based on previous input,
                              // since this one didn't change any direction
@@ -93,19 +89,16 @@ void set_power(char data)
   // stop if input is SPACE, or go straight if input is UP or DOWN
   if (data == 'l')
   {
-    Serial.println("Go left!");
     leftMotor->setSpeed(motor_no_power);
     rightMotor->setSpeed(motor_full_power);
   }
   else if (data == 'r')
   {
-    Serial.println("Your other left!");
     leftMotor->setSpeed(motor_full_power);
     rightMotor->setSpeed(motor_no_power);
   }
   else if (data == 'h')
   {
-    Serial.println("Halt!");
     leftMotor->setSpeed(motor_no_power);
     rightMotor->setSpeed(motor_no_power);
   }
@@ -117,3 +110,4 @@ void set_power(char data)
 }
 
 // https://www.arduino.cc/en/Reference/SerialEvent
+// maybe use an event/callback system?
