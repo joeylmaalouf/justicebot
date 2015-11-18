@@ -1,6 +1,7 @@
 from pygame.color import THECOLORS
 from pykinect.nui import JointId
 
+
 VIDEO_MODE_ARGS = ((640, 480), 0, 32)
 DEPTH_MODE_ARGS = ((320, 240), 0, 16)
 
