@@ -1,3 +1,4 @@
+from pygame.locals import *
 from pygame.color import THECOLORS
 from pykinect.nui import JointId
 

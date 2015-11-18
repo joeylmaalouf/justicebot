@@ -2,25 +2,25 @@ from constants import *
 import ctypes
 import itertools
 import pygame
-from pygame.locals import *
 from pykinect import nui
 import thread
 import sys
 
 
 class Kinect(object):
-  def __init__(self, key_callback = None, key_cb_kwargs = {}):
+  def __init__(
+      self,
+      key_callback  = None, key_cb_kwargs  = {},
+      skel_callback = None, skel_cb_kwargs = {}
+    ):
     super(Kinect, self).__init__()
     pygame.init()
-    self.key_callback = key_callback
-    self.key_cb_kwargs = key_cb_kwargs
+    self.key_callback,  self.key_cb_kwargs  = key_callback,  key_cb_kwargs
+    self.skel_callback, self.skel_cb_kwargs = skel_callback, skel_cb_kwargs
     self.skeletons = None
     self.done = False
-    self.video_mode = True
     self.screen_lock = thread.allocate()
-    self.screen = pygame.display.set_mode(*VIDEO_MODE_ARGS)
-    self.cur_w = pygame.display.Info().current_w
-    self.cur_h = pygame.display.Info().current_h
+    self.set_video_mode(True)
     pygame.display.set_caption("Python Kinect Skeleton Tracking")
 
     self._PyObject_AsWriteBuffer = ctypes.pythonapi.PyObject_AsWriteBuffer
@@ -43,6 +43,9 @@ class Kinect(object):
     with self.screen_lock:
       self.screen = pygame.display.set_mode(*(VIDEO_MODE_ARGS if mode else DEPTH_MODE_ARGS))
       self.video_mode = mode
+      self.cur_w = pygame.display.Info().current_w
+      self.cur_h = pygame.display.Info().current_h
+
 
   def surface_to_array(self, surface):
     buffer_interface = surface.get_buffer()
@@ -63,6 +66,8 @@ class Kinect(object):
     if self.video_mode:
       return
     with self.screen_lock:
+      if self.skel_callback:
+        self.skel_callback(self, **self.skel_cb_kwargs)
       address = self.surface_to_array(self.screen)
       frame.image.copy_bits(address)
       del address
@@ -73,6 +78,8 @@ class Kinect(object):
     if not self.video_mode:
       return
     with self.screen_lock:
+      if self.skel_callback:
+        self.skel_callback(self, **self.skel_cb_kwargs)
       address = self.surface_to_array(self.screen)
       frame.image.copy_bits(address)
       del address
@@ -101,8 +108,6 @@ class Kinect(object):
 
   def start(self):
     while not self.done:
-      self.cur_w = pygame.display.Info().current_w
-      self.cur_h = pygame.display.Info().current_h
       e = pygame.event.wait()
       if e.type == pygame.QUIT:
         self.stop()
