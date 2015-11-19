@@ -21,10 +21,10 @@ def skel_cb(kinect, skeletons, serial):
       skel_center = skeleton.SkeletonPositions[JointId.ShoulderCenter.value]
       if skel_center.x != 0.0 and skel_center.y != 0.0:
         print("{0}: {1}".format(index, skel_center))
-        if skel_center.x < VIDEO_MODE_ARGS[0][0]/3:
+        if skel_center.x < VIDEO_MODE_ARGS[0][0] / 3:
           print("l")
           serial.write("l")
-        elif skel_center.x > VIDEO_MODE_ARGS[0][0]/3*2:
+        elif skel_center.x > VIDEO_MODE_ARGS[0][0] / 3 * 2:
           print("r")
           serial.write("r")
         else:
