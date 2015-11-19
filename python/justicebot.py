@@ -4,7 +4,6 @@ from wrappers.serial_wrapper import connect
 
 
 def key_cb(kinect, key, serial, instructions):
-  print dir(kinect.device.camera)
   if key == K_w:
     kinect.device.camera.elevation_angle += 2
   elif key == K_x:
@@ -33,7 +32,7 @@ def skel_cb(kinect, skeletons, serial):
 
 
 if __name__ == "__main__":
-  serial = connect("/dev/ttyACM*", 9600) # match any port that the Arduino connects to
+  serial = connect("COM7", 9600) # match any port that the Arduino connects to
   instructions = {
     K_UP:       "u", # forwards
     K_DOWN:     "d", # backwards

@@ -11,12 +11,14 @@ class Kinect(object):
   def __init__(
       self,
       key_callback  = None, key_cb_kwargs  = {},
-      skel_callback = None, skel_cb_kwargs = {}
+      skel_callback = None, skel_cb_kwargs = {},
+      verbose = True
     ):
     super(Kinect, self).__init__()
     pygame.init()
     self.key_callback,  self.key_cb_kwargs  = key_callback,  key_cb_kwargs
     self.skel_callback, self.skel_cb_kwargs = skel_callback, skel_cb_kwargs
+    self.verbose = verbose
     self.skeletons = None
     self.done = False
     self.screen_lock = thread.allocate()
@@ -30,8 +32,11 @@ class Kinect(object):
     try:
       self.device = nui.Runtime()
     except WindowsError:
-      print("Error: No Kinect device found.")
+      if self.verbose:
+        print("Error: No Kinect device found.")
       sys.exit()
+    if self.verbose:
+      print("Successfully connected to Kinect.")
     self.device.skeleton_engine.enabled = True
     self.device.skeleton_frame_ready += self.post_frame
     self.device.depth_frame_ready += self.put_depth_frame
