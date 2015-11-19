@@ -15,12 +15,21 @@ def key_cb(kinect, key, serial, instructions):
     serial.write(instructions[key])
 
 
-def skel_cb(kinect):
-  if kinect.skeletons is not None:
-    for index, skeleton in enumerate(kinect.skeletons):
+def skel_cb(kinect, skeletons, serial):
+  if skeletons is not None:
+    for index, skeleton in enumerate(skeletons):
       skel_center = skeleton.SkeletonPositions[JointId.ShoulderCenter.value]
       if skel_center.x != 0.0 and skel_center.y != 0.0:
-        print index, skel_center
+        print("{0}: {1}".format(index, skel_center))
+        if skel_center.x < VIDEO_MODE_ARGS[0][0]/3:
+          print("l")
+          serial.write("l")
+        elif skel_center.x > VIDEO_MODE_ARGS[0][0]/3*2:
+          print("r")
+          serial.write("r")
+        else:
+          print("h")
+          serial.write("h")
 
 
 if __name__ == "__main__":
@@ -42,6 +51,7 @@ if __name__ == "__main__":
     },
     skel_callback = skel_cb,
     skel_cb_kwargs = {
+      "serial": serial
     }
   )
   kinect.start()

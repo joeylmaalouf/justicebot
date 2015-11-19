@@ -67,7 +67,7 @@ class Kinect(object):
       return
     with self.screen_lock:
       if self.skel_callback:
-        self.skel_callback(self, **self.skel_cb_kwargs)
+        self.skel_callback(self, self.skeletons, **self.skel_cb_kwargs)
       address = self.surface_to_array(self.screen)
       frame.image.copy_bits(address)
       del address
@@ -79,7 +79,7 @@ class Kinect(object):
       return
     with self.screen_lock:
       if self.skel_callback:
-        self.skel_callback(self, **self.skel_cb_kwargs)
+        self.skel_callback(self, self.skeletons, **self.skel_cb_kwargs)
       address = self.surface_to_array(self.screen)
       frame.image.copy_bits(address)
       del address

@@ -4,12 +4,11 @@ from serial.serialutil import SerialException
 
 
 def connect(port, baud, verbose = True):
-  """ keep trying to connect to the serial port until it's not busy """
   try:
     port = glob(port)[0]
   except IndexError:
     if verbose:
-      print("Error: No device found matching given port.")
+      print("Error: No device found on given serial port.")
     return None
   while True:
     try:
