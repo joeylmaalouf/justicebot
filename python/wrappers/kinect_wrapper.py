@@ -51,7 +51,6 @@ class Kinect(object):
       self.cur_w = pygame.display.Info().current_w
       self.cur_h = pygame.display.Info().current_h
 
-
   def surface_to_array(self, surface):
     buffer_interface = surface.get_buffer()
     address = ctypes.c_void_p()

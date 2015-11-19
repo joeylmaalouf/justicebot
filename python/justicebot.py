@@ -20,15 +20,15 @@ def skel_cb(kinect, skeletons, serial):
       skel_center = skeleton.SkeletonPositions[JointId.ShoulderCenter.value]
       if skel_center.x != 0.0 and skel_center.y != 0.0:
         if skel_center.x < -0.25:
-          serial.write("l")
+          serial.write("r") # image is flipped, so send opposite instruction
         elif skel_center.x > 0.25:
-          serial.write("r")
+          serial.write("l") # maybe I should figure out how to flip the image before processing
         else:
           serial.write("h")
 
 
 if __name__ == "__main__":
-  serial = connect("COM7", 9600) # match any port that the Arduino connects to
+  serial = connect("COM7", 9600)
   instructions = {
     K_UP:       "u", # forwards
     K_DOWN:     "d", # backwards
