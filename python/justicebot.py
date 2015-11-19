@@ -19,7 +19,6 @@ def skel_cb(kinect, skeletons, serial):
     for index, skeleton in enumerate(skeletons):
       skel_center = skeleton.SkeletonPositions[JointId.ShoulderCenter.value]
       if skel_center.x != 0.0 and skel_center.y != 0.0:
-        print("{0}: {1}".format(index, skel_center))
         if skel_center.x < -0.25:
           serial.write("l")
         elif skel_center.x > 0.25:
