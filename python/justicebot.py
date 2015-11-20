@@ -21,10 +21,13 @@ def skel_cb(kinect, skeletons, serial):
       if skel_center.x != 0.0 and skel_center.y != 0.0:
         if skel_center.x < -0.25:
           serial.write("r") # image is flipped, so send opposite instruction
+          # print("Target is: LEFT")
         elif skel_center.x > 0.25:
           serial.write("l") # maybe I should figure out how to flip the image before processing
+          # print("Target is: RIGHT")
         else:
           serial.write("h")
+          # print("Target is: CENTERED")
 
 
 if __name__ == "__main__":
