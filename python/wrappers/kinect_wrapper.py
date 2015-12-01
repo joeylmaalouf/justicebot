@@ -38,7 +38,7 @@ class Kinect(object):
     if self.verbose:
       print("Successfully connected to Kinect.")
     self.device.skeleton_engine.enabled = True
-    self.device.skeleton_frame_ready += self.post_frame
+    self.device.skeleton_frame_ready += self.post_frame_event
     self.device.depth_frame_ready += self.put_depth_frame
     self.device.video_frame_ready += self.put_video_frame
     self.device.video_stream.open(nui.ImageStreamType.Video, 2, nui.ImageResolution.Resolution640x480, nui.ImageType.Color)
@@ -60,7 +60,7 @@ class Kinect(object):
     bytedata.object = buffer_interface
     return bytedata
 
-  def post_frame(self, frame):
+  def post_frame_event(self, frame):
     try:
       pygame.event.post(pygame.event.Event(pygame.USEREVENT, skeletons = frame.SkeletonData))
     except RuntimeError:
@@ -73,7 +73,8 @@ class Kinect(object):
       if self.skel_callback:
         self.skel_callback(self, self.skeletons, **self.skel_cb_kwargs)
       address = self.surface_to_array(self.screen)
-      frame.image.copy_bits(address)
+      if not self.video_mode:
+        frame.image.copy_bits(address)
       del address
       self.draw_skeletons()
       pygame.display.update()
@@ -85,7 +86,8 @@ class Kinect(object):
       if self.skel_callback:
         self.skel_callback(self, self.skeletons, **self.skel_cb_kwargs)
       address = self.surface_to_array(self.screen)
-      frame.image.copy_bits(address)
+      if self.video_mode:
+        frame.image.copy_bits(address)
       del address
       self.draw_skeletons()
       pygame.display.update()
