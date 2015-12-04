@@ -17,6 +17,7 @@ def key_cb(kinect, key, serial, instructions):
 def skel_cb(kinect, skeletons, serial):
   if skeletons is not None:
     for index, skeleton in enumerate(skeletons):
+      # keep tracked target centered
       skel_center = skeleton.SkeletonPositions[JointId.ShoulderCenter.value]
       if skel_center.x != 0.0 and skel_center.y != 0.0:
         if skel_center.x < -0.25:
@@ -34,6 +35,23 @@ def skel_cb(kinect, skeletons, serial):
         else:
           serial.write("h")
           print("Target is: CENTERED")
+
+        # recognize gesture
+        skel_lelbow = skeleton.SkeletonPositions[JointId.ElbowLeft.value]
+        skel_relbow = skeleton.SkeletonPositions[JointId.ElbowRight.value]
+        skel_lwrist = skeleton.SkeletonPositions[JointId.WristLeft.value]
+        skel_rwrist = skeleton.SkeletonPositions[JointId.WristRight.value]
+        skel_lshoulder = skeleton.SkeletonPositions[JointId.ShoulderLeft.value]
+        skel_rshoulder = skeleton.SkeletonPositions[JointId.ShoulderRight.value]
+        if (skel_lwrist.y > skel_lelbow.y) and (skel_rwrist.y > skel_relbow.y):#and (skel_lwrist.y > skel_center.y) and (skel_rwrist.y > skel_center.y):
+          if (skel_lshoulder.x < (skel_lwrist.x + 0.1)) and ((skel_rwrist.x - 0.1) < skel_rshoulder.x):
+            print("Subject compliant, arms on head. Advised action: apprehend peacefully.")
+          else:
+            print("Subject aggressive, arms raised. Advised action: apprehend with caution.")
+        elif (skel_lwrist.z < (skel_center.z - 0.35)) or skel_rwrist.z < (skel_center.z - 0.35):
+          print("Subject hostile, arm extended. Advised action: user discretion.")
+        else:
+          print("No special gesture recognized. Advised action: unavailable.")
 
 
 if __name__ == "__main__":
