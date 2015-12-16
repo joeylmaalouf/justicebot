@@ -17,4 +17,4 @@ def connect(port, baud, verbose = True):
           print("Error: No device found on given serial port.")
         return None
       else:
-        raise SerialException("")
+        raise
