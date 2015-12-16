@@ -1,113 +1,67 @@
-#include <Wire.h>
-#include <Adafruit_MotorShield.h>
-#define FORWARD 1
-#define BACKWARD 2
-#define RELEASE 3
+#include <Servo.h>
 
-Adafruit_MotorShield MS;
-Adafruit_DCMotor *leftMotor, *rightMotor;
+Servo left, right;
 char prev_data[2] = "h";
 char serial_data[2] = "h";
-int LOOP_DELAY = 100;
-byte LEFT_MOTOR_PORT = 4, RIGHT_MOTOR_PORT = 3;
-byte GREEN_LED = 9, RED_LED = 10;
-int SENSOR_PIN = A0;
-int LED_THRESHOLD = 300;
-byte MOTOR_STEP = 10;
-byte motor_full_power = 255, motor_no_power = 0;
-int sensor_value;
+byte LOOP_DELAY = 20;
+byte LEFT_MOTOR_PORT = 8, RIGHT_MOTOR_PORT = 9;
+byte STATIONARY = 0;
+byte FORWARDS_MAX = 10, FORWARDS_MIN = 100, FORWARDS_STEP = -10;
+byte BACKWARDS_MAX = 170, BACKWARDS_MIN = 80, BACKWARDS_STEP = 10;
+byte forwards = FORWARDS_MIN, backwards = BACKWARDS_MIN;
 
 void setup()
 {
-  MS = Adafruit_MotorShield();
-  MS.begin();
-  leftMotor = MS.getMotor(LEFT_MOTOR_PORT);
-  rightMotor = MS.getMotor(RIGHT_MOTOR_PORT);
-  leftMotor->setSpeed(motor_full_power);
-  rightMotor->setSpeed(motor_full_power);
-  leftMotor->run(BACKWARD);
-  rightMotor->run(FORWARD);
-  pinMode(GREEN_LED, OUTPUT);
-  pinMode(RED_LED, OUTPUT);
+  left.attach(LEFT_MOTOR_PORT);
+  right.attach(RIGHT_MOTOR_PORT);
   Serial.begin(9600);
 }
 
 void loop()
-{
-  sensor_value = analogRead(SENSOR_PIN);
-  if (sensor_value > LED_THRESHOLD)
-  {
-    digitalWrite(GREEN_LED, LOW);
-    digitalWrite(RED_LED, HIGH);
-  }
-  else
-  {
-    digitalWrite(GREEN_LED, HIGH);
-    digitalWrite(RED_LED, LOW);
-  }
-  
+{  
   if (Serial.available())
   {
     memcpy(prev_data, serial_data, sizeof(serial_data));
     Serial.readBytes(serial_data, 1);
   }
+  Serial.println(serial_data);
 
-  // set motor direction if input is UP or DOWN
+  // set motor power based on the input
   if (serial_data[0] == 'u')
   {
-    leftMotor->run(BACKWARD);
-    rightMotor->run(FORWARD);
+    left.write(forwards);
+    right.write(backwards);
   }
   else if (serial_data[0] == 'd')
   {
-    leftMotor->run(FORWARD);
-    rightMotor->run(BACKWARD);
+    left.write(backwards);
+    right.write(forwards);
   }
-  // adjust motor power if input is PGUP or PGDOWN
+  else if (serial_data[0] == 'l')
+  {
+    left.write(forwards);
+    right.write(forwards);
+  }
+  else if (serial_data[0] == 'r')
+  {
+    left.write(backwards);
+    right.write(backwards);
+  }
+  else if (serial_data[0] == 'h')
+  {
+    left.write(STATIONARY);
+    right.write(STATIONARY);
+  }
   else if (serial_data[0] == 'f')
   {
-    motor_full_power = min(255, motor_full_power + MOTOR_STEP);
-    set_power(prev_data[0]); // set powers based on previous input,
-                             // since this one didn't change any direction
+    forwards = min(FORWARDS_MAX, forwards + FORWARDS_STEP);
+    backwards = min(BACKWARDS_MAX, backwards + BACKWARDS_STEP);
   }
   else if (serial_data[0] == 's')
   {
-    motor_full_power = max(0, motor_full_power - MOTOR_STEP);
-    set_power(prev_data[0]); // set powers based on previous input,
-                             // since this one didn't change any direction
+    forwards = max(FORWARDS_MIN, forwards - FORWARDS_STEP);
+    backwards = max(BACKWARDS_MIN, backwards - BACKWARDS_STEP);
   }
-
-  // set which motors have power based on the input
-  set_power(serial_data[0]);
 
   delay(LOOP_DELAY);
 }
-
-void set_power(char data)
-{
-  // set motor powers to turn if input is LEFT or RIGHT,
-  // stop if input is SPACE, or go straight if input is UP or DOWN
-  if (data == 'l')
-  {
-    leftMotor->setSpeed(motor_no_power);
-    rightMotor->setSpeed(motor_full_power);
-  }
-  else if (data == 'r')
-  {
-    leftMotor->setSpeed(motor_full_power);
-    rightMotor->setSpeed(motor_no_power);
-  }
-  else if (data == 'h')
-  {
-    leftMotor->setSpeed(motor_no_power);
-    rightMotor->setSpeed(motor_no_power);
-  }
-  else if (data == 'u' || data == 'd')
-  {
-    leftMotor->setSpeed(motor_full_power);
-    rightMotor->setSpeed(motor_full_power);
-  }
-}
-
-// https://www.arduino.cc/en/Reference/SerialEvent
-// maybe use an event/callback system?
