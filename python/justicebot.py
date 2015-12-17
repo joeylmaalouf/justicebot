@@ -42,6 +42,7 @@ def skel_cb(kinect, skeletons, serial):
           skel_lshoulder = skeleton.SkeletonPositions[JointId.ShoulderLeft.value]
           skel_rshoulder = skeleton.SkeletonPositions[JointId.ShoulderRight.value]
           if (skel_lwrist.z < (skel_center.z - 0.35)) and skel_rwrist.z < (skel_center.z - 0.35):
+            serial.write("g")
             print_data("arms extended -> HOSTILE", "APPREHEND WITH CAUTION")
           elif (skel_lwrist.y > skel_lelbow.y) and (skel_rwrist.y > skel_relbow.y) and \
              (skel_lshoulder.x < (skel_lwrist.x + 0.1)) and ((skel_rwrist.x - 0.1) < skel_rshoulder.x):
@@ -63,7 +64,9 @@ if __name__ == "__main__":
     K_RIGHT:    "r", # right
     K_SPACE:    "h", # halt
     K_PAGEUP:   "f", # faster
-    K_PAGEDOWN: "s"  # slower
+    K_PAGEDOWN: "s", # slower
+    K_c:        "c", # claw
+    K_g:        "g"  # gun
   }
   kinect = Kinect(
     key_callback  = key_cb,
