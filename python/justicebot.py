@@ -65,7 +65,6 @@ if __name__ == "__main__":
     K_SPACE:    "h", # halt
     K_PAGEUP:   "f", # faster
     K_PAGEDOWN: "s", # slower
-    K_c:        "c", # claw
     K_g:        "g"  # gun
   }
   kinect = Kinect(
